@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Survey-Response-Quality-Analyzer
 An ML-based project to analyze survey responses, detect potentially unreliable response patterns, and generate response quality scores.
 # Survey Response Quality Analyzer
@@ -62,4 +62,4 @@ Interactive survey analysis dashboard.
 Automated anomaly detection.
 Response quality scoring.
 Downloadable analysis reports.
->>>>>>> 72c22df (Add README)
+
