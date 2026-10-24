@@ -40,54 +40,51 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap');
     :root {
-      --bg:#f6f8fc; --surface:#ffffff; --surface-soft:#f8faff; --line:#e4e8f0;
-      --text:#202124; --muted:#687386; --blue:#1a73e8; --blue-soft:#e8f0fe;
-      --purple:#7c4dff; --teal:#00897b; --green:#188038; --orange:#b06000;
+      --bg:#0b1120; --surface:#172235; --surface-soft:#1d2b40; --line:#2b3b52;
+      --text:#f3f6fc; --muted:#9aa9bd; --blue:#4f8cff; --blue-soft:#1b3154;
+      --purple:#a78bfa; --teal:#20c5b5; --green:#22c55e; --orange:#f59e0b;
     }
     html, body, [class*="css"] { font-family:'Inter',sans-serif; color:var(--text); }
     .stApp { background:var(--bg); color:var(--text); }
-    [data-testid="stHeader"] { background:rgba(246,248,252,.92); backdrop-filter:blur(14px); }
-    [data-testid="stSidebar"] { background:#fff; border-right:1px solid var(--line); }
+    [data-testid="stHeader"] { background:rgba(11,17,32,.94); }
+    [data-testid="stSidebar"] { background:#111c2e; border-right:1px solid var(--line); }
     [data-testid="stSidebar"] * { color:var(--text); }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label { padding:.62rem .75rem; border-radius:10px; margin:.12rem 0; font-weight:500; }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background:#f1f5fd; }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label[data-checked="true"] { background:var(--blue-soft); color:var(--blue); }
-    .block-container { padding-top:1.3rem; padding-bottom:3rem; max-width:1580px; }
-    h1,h2,h3,h4 { font-family:'Manrope',sans-serif !important; color:#202124 !important; letter-spacing:-.035em; }
-    h1 { font-size:2.15rem !important; font-weight:800 !important; }
-    h2 { font-size:1.55rem !important; font-weight:750 !important; }
-    h3 { font-size:1.12rem !important; font-weight:750 !important; }
-    p, li { color:#465064; }
-    .brand { font-family:'Manrope',sans-serif; font-size:1.8rem; font-weight:800; letter-spacing:-.07em; color:var(--blue); }
-    .brand span { color:#252a35; }
-    .eyebrow { color:#64748b; font-size:.70rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label { padding:.65rem .75rem; border-radius:10px; margin:.12rem 0; font-weight:600; }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background:#20314a; }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label[data-checked="true"] { background:#0f766e; color:#ffffff; }
+    .block-container { padding-top:1.4rem; padding-bottom:3rem; max-width:1580px; }
+    h1,h2,h3,h4 { font-family:'Manrope',sans-serif !important; color:#f4f7fc !important; letter-spacing:-.025em; }
+    p, li, label { color:#c3cede; }
+    .brand { font-family:'Manrope',sans-serif; font-size:1.65rem; font-weight:800; letter-spacing:-.05em; color:#20c5b5; }
+    .brand span { color:#f3f6fc; }
+    .eyebrow { color:#8fa2bc; font-size:.70rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
     .muted { color:var(--muted); }
-    .hero { position:relative; overflow:hidden; background:linear-gradient(115deg,#ffffff 0%,#f0f5ff 65%,#eefbf8 100%); border:1px solid #dce6f7; border-radius:22px; padding:1.7rem 1.9rem; margin-bottom:1.35rem; box-shadow:0 5px 22px rgba(39,67,115,.055); }
-    .hero:after { content:'✦'; position:absolute; right:5%; top:-55px; font-size:13rem; color:rgba(26,115,232,.065); transform:rotate(12deg); pointer-events:none; }
-    .hero-title { font-family:'Manrope',sans-serif; font-size:2.15rem; line-height:1.15; font-weight:800; color:#1d2b44; margin:.42rem 0 .55rem; letter-spacing:-.06em; }
-    .hero-sub { color:#5b667a; font-size:.98rem; max-width:760px; line-height:1.65; }
-    .metric-card { background:var(--surface); border:1px solid var(--line); border-radius:17px; padding:1.15rem 1.2rem; min-height:128px; box-shadow:0 2px 7px rgba(26,39,68,.025); transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
-    .metric-card:hover { transform:translateY(-2px); border-color:#b8cdf4; box-shadow:0 8px 24px rgba(26,115,232,.08); }
-    .metric-label { color:#6b7280; font-size:.72rem; font-weight:800; letter-spacing:.075em; }
-    .metric-value { color:#202124; font-family:'Manrope',sans-serif; font-size:2rem; font-weight:800; margin-top:.48rem; line-height:1.1; }
-    .metric-note { color:var(--teal); font-size:.77rem; margin-top:.5rem; font-weight:600; }
-    .section-head { font-family:'Manrope',sans-serif; color:#273449; font-size:1.08rem; font-weight:800; margin:.65rem 0 .85rem; }
-    .pill { display:inline-block; border-radius:999px; padding:.38rem .72rem; font-size:.73rem; font-weight:700; background:#fff; color:#42618c; border:1px solid #dce5f2; }
-    div[data-testid="stFileUploader"] { background:#fff; border:1.5px dashed #a9bfdf; border-radius:16px; padding:.8rem; }
-    div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:13px; overflow:hidden; background:#fff; }
-    div[data-testid="stMetric"] { background:#fff; border:1px solid var(--line); padding:1rem; border-radius:15px; box-shadow:0 2px 7px rgba(26,39,68,.025); }
-    div[data-testid="stMetricLabel"] { color:#687386; }
-    div[data-testid="stMetricValue"] { color:#202124; }
-    .stButton button,.stDownloadButton button { border-radius:10px; border:1px solid #1a73e8; background:#1a73e8; color:#fff; font-weight:700; min-height:2.65rem; box-shadow:0 2px 5px rgba(26,115,232,.15); transition:all .16s ease; }
-    .stButton button:hover,.stDownloadButton button:hover { border-color:#155fc0; background:#155fc0; color:#fff; transform:translateY(-1px); }
-    .stButton button[kind="secondary"], .stDownloadButton button[kind="secondary"] { background:#fff; color:#1a73e8; }
-    div[data-baseweb="select"] > div { background:#fff; border-color:#d5dce8; border-radius:10px; }
-    input,textarea { background:#fff !important; color:#202124 !important; border-color:#d5dce8 !important; }
-    [data-testid="stExpander"] { background:#fff; border:1px solid var(--line); border-radius:13px; }
-    [data-testid="stAlert"] { border-radius:12px; }
-    [data-testid="stTabs"] button { font-weight:700; }
-    [data-testid="stTabs"] button[aria-selected="true"] { color:var(--blue); }
-    hr { border-color:#e5eaf2; }
+    .hero { position:relative; overflow:hidden; background:linear-gradient(115deg,#17263b 0%,#182b45 65%,#123a3d 100%); border:1px solid #2b4561; border-radius:20px; padding:1.6rem 1.8rem; margin-bottom:1.3rem; }
+    .hero:after { content:'✦'; position:absolute; right:5%; top:-55px; font-size:13rem; color:rgba(32,197,181,.08); transform:rotate(12deg); pointer-events:none; }
+    .hero-title { font-family:'Manrope',sans-serif; font-size:2.05rem; line-height:1.15; font-weight:800; color:#f8fbff; margin:.42rem 0 .55rem; letter-spacing:-.04em; }
+    .hero-sub { color:#b8c8dc; font-size:.98rem; max-width:760px; line-height:1.65; }
+    .metric-card { background:var(--surface); border:1px solid var(--line); border-radius:15px; padding:1.1rem 1.15rem; min-height:120px; box-shadow:0 3px 12px rgba(0,0,0,.12); }
+    .metric-card:hover { border-color:#496888; }
+    .metric-label { color:#9aabc1; font-size:.72rem; font-weight:800; letter-spacing:.06em; }
+    .metric-value { color:#f5f8ff; font-family:'Manrope',sans-serif; font-size:1.9rem; font-weight:800; margin-top:.48rem; line-height:1.1; }
+    .metric-note { color:#20c5b5; font-size:.77rem; margin-top:.5rem; font-weight:600; }
+    .section-head { font-family:'Manrope',sans-serif; color:#e5edf8; font-size:1.08rem; font-weight:800; margin:.65rem 0 .85rem; }
+    .pill { display:inline-block; border-radius:999px; padding:.38rem .72rem; font-size:.73rem; font-weight:700; background:#1b2c42; color:#c8d8ee; border:1px solid #344a64; }
+    div[data-testid="stFileUploader"] { background:#172235; border:1.5px dashed #496888; border-radius:14px; padding:.8rem; }
+    div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#172235; }
+    div[data-testid="stMetric"] { background:var(--surface); border:1px solid var(--line); padding:1rem; border-radius:14px; }
+    div[data-testid="stMetricLabel"] { color:#a7b6ca; }
+    div[data-testid="stMetricValue"] { color:#f5f8ff; }
+    .stButton button,.stDownloadButton button { border-radius:9px; border:1px solid #167d78; background:#0f766e; color:#fff; font-weight:700; min-height:2.55rem; transition:all .16s ease; }
+    .stButton button:hover,.stDownloadButton button:hover { border-color:#20c5b5; background:#0e8b80; color:#fff; }
+    .stButton button[kind="secondary"], .stDownloadButton button[kind="secondary"] { background:#1b2c42; color:#e8f0fc; border-color:#3a506b; }
+    div[data-baseweb="select"] > div { background:#172235; border-color:#344a64; border-radius:9px; }
+    input,textarea { background:#172235 !important; color:#f3f6fc !important; border-color:#344a64 !important; }
+    [data-testid="stExpander"] { background:#172235; border:1px solid var(--line); border-radius:12px; }
+    [data-testid="stAlert"] { border-radius:11px; }
+    [data-testid="stTabs"] button { font-weight:700; color:#b8c8dc; }
+    [data-testid="stTabs"] button[aria-selected="true"] { color:#20c5b5; }
+    hr { border-color:#2b3b52; }
     #MainMenu, footer { visibility:hidden; }
     @media(max-width:700px) { .block-container{padding-left:1rem;padding-right:1rem;} h1{font-size:1.75rem!important;} .hero{padding:1.25rem;} .hero-title{font-size:1.65rem;} .metric-value{font-size:1.65rem;} }
     </style>
@@ -275,9 +272,9 @@ with st.sidebar:
     )
     st.divider()
     st.markdown('<div class="eyebrow">PROJECT STATUS</div>', unsafe_allow_html=True)
-    st.markdown("🟢 Analysis engine ready")
-    st.markdown("🗄️ SQLite storage")
-    st.markdown("🧠 Isolation Forest")
+    st.markdown("🟢 Analysis engine")
+    st.markdown("🗄️ Results database")
+    st.markdown("🧠 Anomaly detection")
     st.markdown("<br><span class='muted'>Flags suggest a review; they do not prove a response is invalid.</span>", unsafe_allow_html=True)
 
 # Load the most recent results, if available.
@@ -302,7 +299,7 @@ st.markdown(
     <div class="hero">
       <div class="eyebrow">SURVEY RESPONSE INTELLIGENCE</div>
       <div class="hero-title">Clarity in every response.</div>
-      <div class="hero-sub">A modern workspace to explore survey data, uncover unusual patterns, and review response quality with confidence.</div>
+      <div class="hero-sub">Upload survey responses to see data quality, suspicious patterns, ML anomaly signals, and a clear quality score for every response.</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -311,7 +308,7 @@ st.markdown(
 # -------------------------- Pages -------------------------
 if page == "Module pipeline":
     st.header("Module pipeline")
-    st.write("Each module is shown separately with its purpose, execution status, and generated output. Run an analysis from Upload & analyze or the demo dataset to refresh the output files.")
+    st.write("Follow each stage of the analysis. Every card explains what the module does, which output it creates, and how its result is used by the next stage.")
 
     modules = [
         {"name": "1 · Data Preprocessing", "script": "preprocessing.py", "output": OUTPUT_DIR / "cleaned_survey_data.csv", "purpose": "Loads the raw survey, checks data quality, and removes exact duplicate rows.", "columns": ["Response_ID", "Completion_Status", "Response_Time_Seconds"]},
@@ -567,7 +564,12 @@ else:
                     qmeans = qnumeric.mean().dropna().rename_axis("Question").reset_index(name="Average numeric value")
                     if not qmeans.empty:
                         qmeans["Question"] = qmeans["Question"].astype(str).str.replace("_", " ")
-                        st.bar_chart(qmeans.set_index("Question"), color="#63D6C6")
+                        st.bar_chart(
+                            category_chart.set_index("Category"),
+                            height=350,
+                            use_container_width=True,
+                            color="#63D6C6"
+                        )
                     else:
                         st.caption("This survey uses categorical answers; numeric rating averages are not shown.")
             else:
