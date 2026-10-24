@@ -1,5 +1,4 @@
 import pandas as pd
-import os
 
 # Load the survey data
 df = pd.read_csv("outputs/survey_features.csv")
@@ -25,7 +24,6 @@ question_columns = [
     "Q8_Overall_Experience"
 ]
 
-# Keep only question columns that exist
 question_columns = [
     col for col in question_columns if col in df.columns
 ]
@@ -36,34 +34,61 @@ df["Repeated_Pattern_Flag"] = df.duplicated(
 )
 
 # 5. Check short comments
-df["Short_Comment_Flag"] = (
-    df["Comment_Length"] <= 2
+df["Short_Comment_Flag"] = df["Comment_Length"] <= 2
+
+# 6. Check potentially contradictory responses
+
+df["Contradictory_Response_Flag"] = (
+    (
+        (df["Q1_Ease_of_Use"] <= 2)
+        & (df["Q5_Clarity"] >= 4)
+    )
+    | (
+        (df["Q1_Ease_of_Use"] >= 4)
+        & (df["Q5_Clarity"] <= 2)
+    )
+    | (
+        (df["Q2_Satisfaction"] <= 2)
+        & (df["Q8_Overall_Experience"] >= 4)
+    )
+    | (
+        (df["Q2_Satisfaction"] >= 4)
+        & (df["Q8_Overall_Experience"] <= 2)
+    )
+    | (
+        (df["Q4_Support"] <= 2)
+        & (df["Q8_Overall_Experience"] >= 4)
+    )
+    | (
+        (df["Q4_Support"] >= 4)
+        & (df["Q8_Overall_Experience"] <= 2)
+    )
 )
 
-# 6. Final review recommendation
+# 7. Recommend responses for review
 df["Review_Recommended"] = (
     df["Incomplete_Response"]
     | df["Straight_Lining_Flag"]
     | df["Fast_Response_Flag"]
     | df["Repeated_Pattern_Flag"]
     | df["Short_Comment_Flag"]
+    | df["Contradictory_Response_Flag"]
 )
 
 # Display results
+result_columns = [
+    "Response_ID",
+    "Incomplete_Response",
+    "Straight_Lining_Flag",
+    "Fast_Response_Flag",
+    "Repeated_Pattern_Flag",
+    "Short_Comment_Flag",
+    "Contradictory_Response_Flag",
+    "Review_Recommended"
+]
+
 print("\nResponse Analysis Results:")
-print(
-    df[
-        [
-            "Response_ID",
-            "Incomplete_Response",
-            "Straight_Lining_Flag",
-            "Fast_Response_Flag",
-            "Repeated_Pattern_Flag",
-            "Short_Comment_Flag",
-            "Review_Recommended"
-        ]
-    ].head(10)
-)
+print(df[result_columns].head(10).to_string(index=False))
 
 # Display summary
 print("\nTotal Responses:", len(df))
@@ -71,11 +96,11 @@ print("Incomplete Responses:", df["Incomplete_Response"].sum())
 print("Straight-Lining Responses:", df["Straight_Lining_Flag"].sum())
 print("Fast Responses:", df["Fast_Response_Flag"].sum())
 print("Repeated Patterns:", df["Repeated_Pattern_Flag"].sum())
+print("Short Comments:", df["Short_Comment_Flag"].sum())
+print("Potentially Contradictory Responses:", df["Contradictory_Response_Flag"].sum())
 print("Responses Recommended for Review:", df["Review_Recommended"].sum())
 
 # Save the results
-os.makedirs("outputs", exist_ok=True)
-
 df.to_csv("outputs/response_analysis.csv", index=False)
 
 print("\nAnalysis completed successfully!")
