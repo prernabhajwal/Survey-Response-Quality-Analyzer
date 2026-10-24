@@ -1,94 +1,92 @@
-
 import pandas as pd
-import os
 
+# =====================================
+# 1. EXPLORATORY DATA ANALYSIS (EDA)
+# =====================================
 
-def load_dataset(file_path):
-    """Load survey responses from a CSV file."""
+def perform_eda(df):
 
-    try:
-        df = pd.read_csv(file_path)
+    print("\n========== DATASET OVERVIEW ==========")
+    print("Dataset Shape:", df.shape)
 
-        print("\nDataset loaded successfully!")
-        print("-" * 40)
-
-        print("\nFirst 5 Responses:")
-        print(df.head())
-
-        print("\nDataset Shape:")
-        print(f"Rows: {df.shape[0]}")
-        print(f"Columns: {df.shape[1]}")
-
-        return df
-
-    except FileNotFoundError:
-        print("Error: CSV file not found.")
-        return None
-
-    except Exception as error:
-        print("Error loading dataset:", error)
-        return None
-
-
-def check_missing_values(df):
-    """Check missing values in each column."""
+    print("\nFirst Five Responses:")
+    print(df.head())
 
     print("\nMissing Values:")
     print(df.isnull().sum())
 
-    total_missing = df.isnull().sum().sum()
-    print(f"\nTotal Missing Values: {total_missing}")
+    print("\nDuplicate Rows:", df.duplicated().sum())
 
+    print("\nStatistical Summary:")
+    print(df.describe(include="all"))
 
-def check_duplicates(df):
-    """Identify duplicate survey responses."""
+    print("\nMean:") 
+    print(df.select_dtypes(include="number").mean())
+    print("\nMedian:") 
+    print(df.select_dtypes(include="number").median())
+    print("\nMode:") 
+    print(df.mode().iloc[0])
 
-    duplicate_count = df.duplicated().sum()
+# =====================================
+# 2. DATA PREPROCESSING
+# =====================================
 
-    print(f"\nDuplicate Rows: {duplicate_count}")
+def preprocess_data(df):
 
+    if df is None or df.empty:
+        raise ValueError("Please upload a valid survey dataset.")
 
-def clean_dataset(df):
-    """Remove exact duplicate rows and prepare the dataset."""
-
+    # Create a copy
     df = df.copy()
 
-    initial_rows = len(df)
+    # Clean column names
+    df.columns = df.columns.astype(str).str.strip()
 
-    df = df.drop_duplicates()
+    # Remove completely empty rows and columns
+    df.dropna(how="all", inplace=True)
+    df.dropna(axis=1, how="all", inplace=True)
 
-    removed_rows = initial_rows - len(df)
+    # Remove duplicate responses
+    df.drop_duplicates(inplace=True)
 
-    print(f"\nDuplicate Rows Removed: {removed_rows}")
-    print(f"Rows After Cleaning: {len(df)}")
+    # Remove extra spaces from text responses
+    for column in df.select_dtypes(include=["object", "str"]).columns:
+        df[column] = df[column].apply(
+            lambda value: value.strip()
+            if isinstance(value, str)
+            else value
+        )
+
+    # Convert blank strings into missing values
+    df.replace(r"^\s*$", pd.NA, regex=True, inplace=True)
+
+    # Reset index
+    df.reset_index(drop=True, inplace=True)
 
     return df
 
 
-def save_cleaned_dataset(df):
-    """Save the cleaned dataset to the outputs folder."""
-
-    os.makedirs("outputs", exist_ok=True)
-
-    output_path = "outputs/cleaned_survey_data.csv"
-
-    df.to_csv(output_path, index=False)
-
-    print(f"\nCleaned dataset saved to: {output_path}")
-
+# =====================================
+# 3. RUN EDA AND PREPROCESSING
+# =====================================
 
 if __name__ == "__main__":
 
-    file_path = "data/survey_response_quality_demo.csv"
+    # Read the original survey dataset
+    df = pd.read_csv("data/survey_response_quality_demo.csv")
 
-    df = load_dataset(file_path)
+    # Step 1: Perform EDA
+    perform_eda(df)
 
-    if df is not None:
+    # Step 2: Clean the dataset
+    cleaned_df = preprocess_data(df)
 
-        check_missing_values(df)
+    # Step 3: Save cleaned data
+    cleaned_df.to_csv("outputs/cleaned_survey_data.csv", index=False)
 
-        check_duplicates(df)
+    print("\nPreprocessing completed successfully!")
+    print("Cleaned dataset saved as cleaned_survey_data.csv")
 
-        cleaned_df = clean_dataset(df)
+    print("\nCleaned Dataset:")
+    print(cleaned_df.head())
 
-        save_cleaned_dataset(cleaned_df)
