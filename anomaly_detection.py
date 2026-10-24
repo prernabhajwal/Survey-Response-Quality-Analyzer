@@ -1,12 +1,11 @@
-
 import pandas as pd
-import os
 from sklearn.ensemble import IsolationForest
 
-# Load the analyzed survey data
+# Step 1: Load survey data
 df = pd.read_csv("outputs/response_analysis.csv")
 
-# Select numerical features for machine learning
+
+# Step 2: Select features for anomaly detection
 features = [
     "Completion_Rate",
     "Unique_Answers",
@@ -16,53 +15,78 @@ features = [
     "Response_Time_Seconds"
 ]
 
-# Prepare the data
 X = df[features].copy()
 
-# Handle missing and infinite values
-X = X.replace([float("inf"), float("-inf")], float("nan"))
-X = X.fillna(X.median())
 
-# Create the Isolation Forest model
+# Step 3: Convert feature values into numbers
+X = X.apply(pd.to_numeric, errors="coerce")
+
+
+# Step 4: Handle missing and infinite values
+X = X.replace([float("inf"), float("-inf")], float("nan"))
+
+X = X.fillna(X.median())
+X = X.fillna(0)
+
+
+# Step 5: Create the Isolation Forest model
 model = IsolationForest(
     n_estimators=100,
     contamination="auto",
     random_state=42
 )
 
-# Train the model and detect anomalies
+
+# Step 6: Detect anomalies
 predictions = model.fit_predict(X)
 
-# Convert predictions into readable labels
+
+# Step 7: Assign labels to responses
 df["Anomaly_Status"] = predictions
-df["Anomaly_Status"] = df["Anomaly_Status"].map({
+
+df["Anomaly_Status"] = df["Anomaly_Status"].replace({
     1: "Normal",
     -1: "Anomaly"
 })
 
-# Display the results
+
+# Step 8: Display the first 10 results
 print("\nAnomaly Detection Results:")
+
 print(
-    df[
-        ["Response_ID", "Anomaly_Status"]
-    ].head(10)
+    df[["Response_ID", "Anomaly_Status"]].head(10)
 )
 
-# Display summary
+
+# Step 9: Display only anomalous responses
+print("\nDetails of Anomalous Responses:")
+
+anomalies = df[df["Anomaly_Status"] == "Anomaly"]
+
+print(
+    anomalies[
+        ["Response_ID"] + features
+    ].to_string(index=False)
+)
+
+
+# Step 10: Display summary
 print("\nTotal Responses:", len(df))
+
 print(
     "Normal Responses:",
     (df["Anomaly_Status"] == "Normal").sum()
 )
+
 print(
     "Anomalies Detected:",
     (df["Anomaly_Status"] == "Anomaly").sum()
 )
 
-# Save the results
-os.makedirs("outputs", exist_ok=True)
 
+# Step 11: Save the results
 df.to_csv("outputs/anomaly_results.csv", index=False)
 
 print("\nAnomaly detection completed successfully!")
 print("Results saved to outputs/anomaly_results.csv")
+
