@@ -1,34 +1,39 @@
 import pandas as pd
-import os
 
-# Load anomaly detection results
+# Step 1: Load anomaly detection results
 df = pd.read_csv("outputs/anomaly_results.csv")
 
-# Start with a score of 100 for every response
+
+# Step 2: Give every response a starting score of 100
 df["Quality_Score"] = 100
 
-# Reduce score for incomplete responses
-df.loc[df["Incomplete_Response"], "Quality_Score"] -= 20
 
-# Reduce score for straight-lining
-df.loc[df["Straight_Lining_Flag"], "Quality_Score"] -= 15
+# Step 3: Deduct points for response quality issues
 
-# Reduce score for very fast responses
-df.loc[df["Fast_Response_Flag"], "Quality_Score"] -= 15
+# Incomplete responses
+df.loc[df["Incomplete_Response"] == True, "Quality_Score"] -= 20
 
-# Reduce score for repeated answer patterns
-df.loc[df["Repeated_Pattern_Flag"], "Quality_Score"] -= 15
+# Straight-lining
+df.loc[df["Straight_Lining_Flag"] == True, "Quality_Score"] -= 15
 
-# Reduce score for very short comments
-df.loc[df["Short_Comment_Flag"], "Quality_Score"] -= 10
+# Very fast responses
+df.loc[df["Fast_Response_Flag"] == True, "Quality_Score"] -= 15
 
-# Reduce score if Isolation Forest detects an anomaly
+# Repeated answer patterns
+df.loc[df["Repeated_Pattern_Flag"] == True, "Quality_Score"] -= 15
+
+# Very short comments
+df.loc[df["Short_Comment_Flag"] == True, "Quality_Score"] -= 10
+
+# Anomalies detected by Isolation Forest
 df.loc[df["Anomaly_Status"] == "Anomaly", "Quality_Score"] -= 15
 
-# Keep the score between 0 and 100
+
+# Step 4: Keep scores between 0 and 100
 df["Quality_Score"] = df["Quality_Score"].clip(0, 100)
 
-# Classify responses based on their scores
+
+# Step 5: Classify response quality
 def classify_quality(score):
     if score >= 75:
         return "High Quality"
@@ -37,25 +42,25 @@ def classify_quality(score):
     else:
         return "Low Quality"
 
+
 df["Quality_Category"] = df["Quality_Score"].apply(classify_quality)
 
-# Display results
-print("\nSurvey Response Quality Results:\n")
+# Step 6: Display all response quality results
+print("\nAll Survey Response Quality Results:\n")
 
 print(
     df[
         ["Response_ID", "Quality_Score", "Quality_Category"]
-    ].head(10).to_string(index=False)
+    ].to_string(index=False)
 )
 
-# Display category summary
+
+# Step 7: Display category summary
 print("\nQuality Category Summary:")
 print(df["Quality_Category"].value_counts())
 
-# Save the final results
-os.makedirs("outputs", exist_ok=True)
 
+# Step 8: Save final results
 df.to_csv("outputs/final_quality_results.csv", index=False)
 
 print("\nQuality scoring completed successfully!")
-print("Results saved to outputs/final_quality_results.csv")
