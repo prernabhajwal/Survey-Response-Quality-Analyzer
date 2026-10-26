@@ -21,77 +21,68 @@ def create_table():
 
     conn.commit()
     conn.close()
-    print("Table created successfully!")
 
 
-# 2. Insert Data
-def insert_data():
-    df = pd.read_csv("outputs/final_quality_results.csv")
-
+# 2. Save New Records
+def save_results(df):
+    create_table()
     conn = sqlite3.connect(DATABASE)
 
-    # Remove old records before inserting current data
-    conn.execute("DELETE FROM survey_responses")
-
     for _, row in df.iterrows():
+        response_id = str(row["Response_ID"]).strip()
+
         conn.execute("""
-            INSERT INTO survey_responses
+            INSERT OR IGNORE INTO survey_responses
             VALUES (?, ?, ?, ?, ?, ?)
         """, (
-            str(row["Response_ID"]),
-            row["Completion_Rate"],
-            row["Average_Rating"],
+            response_id,
+            row.get("Completion_Rate", 0),
+            row.get("Average_Rating", 0),
             row["Quality_Score"],
             row["Quality_Category"],
-            row["Anomaly_Status"]
+            row.get("Anomaly_Status", "Normal")
         ))
 
     conn.commit()
     conn.close()
 
-    print("Data inserted successfully!")
-    print("Records inserted:", len(df))
 
-
-# 3. Display All Records
-def view_data():
+# 3. Retrieve All Records
+def get_results():
+    create_table()
     conn = sqlite3.connect(DATABASE)
 
     df = pd.read_sql_query(
-        "SELECT * FROM survey_responses", conn
+        "SELECT * FROM survey_responses ORDER BY rowid DESC",
+        conn
     )
 
     conn.close()
+    return df
 
-    print("\nAll Survey Responses:")
+
+# 4. Display All Records
+def view_data():
+    df = get_results()
+    print("\nAll Survey Records:")
     print(df.to_string(index=False))
     print("\nTotal Records:", len(df))
 
 
-# 4. Search a Response
+# 5. Search a Record
 def search_data(response_id):
     conn = sqlite3.connect(DATABASE)
 
     result = conn.execute("""
         SELECT * FROM survey_responses
         WHERE response_id = ?
-    """, (response_id.strip(),)).fetchone()
+    """, (str(response_id).strip(),)).fetchone()
 
     conn.close()
-
-    if result:
-        print("\nResponse Found!")
-        print("Response ID:", result[0])
-        print("Completion Rate:", result[1])
-        print("Average Rating:", result[2])
-        print("Quality Score:", result[3])
-        print("Quality Category:", result[4])
-        print("Anomaly Status:", result[5])
-    else:
-        print("\nResponse not found!")
+    return result
 
 
-# 5. Update Quality Category
+# 6. Update Quality Category
 def update_data(response_id, new_category):
     conn = sqlite3.connect(DATABASE)
 
@@ -99,49 +90,51 @@ def update_data(response_id, new_category):
         UPDATE survey_responses
         SET quality_category = ?
         WHERE response_id = ?
-    """, (new_category, response_id.strip()))
+    """, (new_category, str(response_id).strip()))
 
     conn.commit()
+    updated = cursor.rowcount > 0
     conn.close()
 
-    if cursor.rowcount > 0:
-        print("Response updated successfully!")
-    else:
-        print("Response not found!")
+    return updated
 
 
-# 6. Delete a Response
+# 7. Delete a Record
 def delete_data(response_id):
     conn = sqlite3.connect(DATABASE)
 
     cursor = conn.execute("""
         DELETE FROM survey_responses
         WHERE response_id = ?
-    """, (response_id.strip(),))
+    """, (str(response_id).strip(),))
 
+    conn.commit()
+    deleted = cursor.rowcount > 0
+    conn.close()
+
+    return deleted
+
+
+# 8. Test Database
+if __name__ == "__main__":
+    create_table()
+
+    df = pd.read_csv("outputs/final_quality_results.csv")
+    save_results(df)
+
+    print("Data saved successfully!")
+    view_data()
+
+if __name__ == "__main__":
+    create_table()
+
+    conn = sqlite3.connect(DATABASE)
+    conn.execute("DELETE FROM survey_responses")
     conn.commit()
     conn.close()
 
-    if cursor.rowcount > 0:
-        print("Response deleted successfully!")
-    else:
-        print("Response not found!")
-
-
-# Main Program
-if __name__ == "__main__":
-
-    create_table()
-    insert_data()
-    view_data()
-
-    # Search for a response that exists in the CSV
     df = pd.read_csv("outputs/final_quality_results.csv")
-    response_id = str(df.iloc[0]["Response_ID"])
+    save_results(df)
 
-    print("\nSearching for:", response_id)
-    search_data(response_id)
-
-    # Uncomment to test Update or Delete
-    # update_data(response_id, "Medium Quality")
-    # delete_data(response_id)
+    print("Database reset and new data saved!")
+    view_data()
