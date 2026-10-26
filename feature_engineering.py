@@ -1,13 +1,32 @@
 import pandas as pd
 
 
-def extract_features(df):
+def extract_features(df, question_columns=None):
 
     # Protect original dataset
     df = df.copy()
 
     # Select survey questions
-    questions = df.loc[:, "Q1_Ease_of_Use":"Q8_Overall_Experience"]
+    if question_columns is None:
+        question_columns = [
+            "Q1_Ease_of_Use",
+            "Q2_Satisfaction",
+            "Q3_Speed",
+            "Q4_Support",
+            "Q5_Clarity",
+            "Q6_Reliability",
+            "Q7_Recommend",
+            "Q8_Overall_Experience"
+        ]
+
+    question_columns = [
+        col for col in question_columns if col in df.columns
+    ]
+
+    if not question_columns:
+        raise ValueError("Please select survey question columns.")
+
+    questions = df[question_columns].copy()
 
     # Convert answers into numbers
     questions = questions.apply(pd.to_numeric, errors="coerce")
@@ -17,7 +36,8 @@ def extract_features(df):
 
     # Calculate completion rate
     df["Completion_Rate"] = (
-        (8 - df["Missing_Answers"]) / 8
+        (len(question_columns) - df["Missing_Answers"])
+        / len(question_columns)
     ) * 100
 
     # Count different answers
@@ -35,18 +55,28 @@ def extract_features(df):
     df["Straight_Lining"] = (
         (df["Unique_Answers"] == 1) & (answered >= 2)
     )
+
     # Check response time
     if "Response_Time_Seconds" in df.columns:
         df["Very_Short_Response_Time"] = (
-            pd.to_numeric(df["Response_Time_Seconds"], errors="coerce") < 60
+            pd.to_numeric(
+                df["Response_Time_Seconds"], errors="coerce"
+            ) < 60
         )
     else:
         df["Very_Short_Response_Time"] = False
-        
+
     # Count words in comments
-    df["Comment_Length"] = (
-        df["Free_Text_Comment"].fillna("").str.split().str.len()
-    )
+    if "Free_Text_Comment" in df.columns:
+        df["Comment_Length"] = (
+            df["Free_Text_Comment"]
+            .fillna("")
+            .astype(str)
+            .str.split()
+            .str.len()
+        )
+    else:
+        df["Comment_Length"] = 0
 
     return df
 
