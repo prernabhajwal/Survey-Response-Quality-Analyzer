@@ -132,10 +132,30 @@ def run_pipeline(raw_df, question_columns):
         index=False
     )
 
+    # Use numeric answer columns for rating-based feature calculations.
+    # Text comments and other non-numeric fields must not count as missing ratings.
+    numeric_question_columns = []
+
+    for column in question_columns:
+        if column in cleaned.columns:
+            numeric_values = pd.to_numeric(
+                cleaned[column],
+                errors="coerce"
+            )
+
+            if numeric_values.notna().any():
+                numeric_question_columns.append(column)
+
+    if not numeric_question_columns:
+        raise ValueError(
+            "No numeric survey answer columns were selected. "
+            "Select the numeric rating/question columns (for example, Q1 to Q8)."
+        )
+
     # Step 2: Feature Engineering
     featured = extract_features(
         cleaned,
-        question_columns
+        numeric_question_columns
     )
 
     featured.to_csv(
@@ -146,7 +166,7 @@ def run_pipeline(raw_df, question_columns):
     # Step 3: Rule-Based Response Analysis
     analyzed = analyze_responses(
         featured,
-        question_columns
+        numeric_question_columns
     )
 
     analyzed.to_csv(
@@ -1063,3 +1083,4 @@ elif page == "Saved Records":
             f"Could not load the database: {error}"
         )
 
+#streamlit run app.py
