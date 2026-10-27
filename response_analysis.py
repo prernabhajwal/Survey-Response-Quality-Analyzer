@@ -6,9 +6,19 @@ def analyze_responses(df, question_columns=None):
 
     # Create a copy of survey data
     df = df.copy()
+   
+    print("\n--- CHECK BEFORE ANALYSIS ---")
+    print(df["Missing_Answers"].value_counts(dropna=False))
+    print("Total missing cells:", df["Missing_Answers"].sum())
+
 
     # 1. Check incomplete responses
     df["Incomplete_Response"] = df["Missing_Answers"] > 0
+
+    print("\n--- INCOMPLETE RESPONSE CHECK ---")
+    print(df["Missing_Answers"].value_counts().sort_index())
+    print("Incomplete responses:", df["Incomplete_Response"].sum())
+    print("Complete responses:", (df["Missing_Answers"] == 0).sum())
 
     # 2. Check straight-lining
     df["Straight_Lining_Flag"] = df["Straight_Lining"]
@@ -96,7 +106,21 @@ def analyze_responses(df, question_columns=None):
         | df["Short_Comment_Flag"]
         | df["Contradictory_Response_Flag"]
     )
+    print("\n--- Flag Summary ---")
+    flags = [
+        "Incomplete_Response",
+        "Straight_Lining_Flag",
+        "Fast_Response_Flag",
+        "Repeated_Pattern_Flag",
+        "Short_Comment_Flag",
+        "Contradictory_Response_Flag"
+    ]
 
+    for col in flags:
+        print(f"{col}: {df[col].sum()}")
+
+    print("Total Responses:", len(df))
+    print("Review Recommended:", df["Review_Recommended"].sum())
     return df
 
 

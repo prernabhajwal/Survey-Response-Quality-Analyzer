@@ -25,14 +25,35 @@ def extract_features(df, question_columns=None):
 
     if not question_columns:
         raise ValueError("Please select survey question columns.")
+    
+    print("\n--- MISSING VALUES BEFORE FEATURE ENGINEERING ---")
+    print(df[question_columns].isnull().sum())
+
+    print("\n--- SAMPLE SURVEY RESPONSES ---")
+    print(df[question_columns].head(5).to_string(index=False))
+
 
     questions = df[question_columns].copy()
+    
+    print("\n--- ORIGINAL QUESTION DATA ---")
+    print(df[question_columns].head(10).to_string(index=False))
+
+    print("\n--- DATA TYPES ---")
+    print(df[question_columns].dtypes)
+
+    print("\n--- UNIQUE ANSWERS ---")
+    for col in question_columns:
+        print(col, ":", df[col].dropna().unique()[:10])
+
 
     # Convert answers into numbers
     questions = questions.apply(pd.to_numeric, errors="coerce")
 
     # Count missing answers
     df["Missing_Answers"] = questions.isnull().sum(axis=1)
+    print("\n--- MISSING ANSWERS DISTRIBUTION ---")
+    print(df["Missing_Answers"].value_counts().sort_index())
+    print("Total missing cells:", df["Missing_Answers"].sum())
 
     # Calculate completion rate
     df["Completion_Rate"] = (
